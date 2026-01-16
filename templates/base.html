@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Couple Journey</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.0/mdb.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+  <a class="navbar-brand" href="/">💞 Couple Journey</a>
+
+  <div class="ms-auto d-flex align-items-center gap-3">
+
+    {% if user.is_authenticated %}
+      <a href="/add/" class="btn btn-light btn-sm">ADD JOURNEY</a>
+
+      <!-- 🌙 Dark Mode Toggle -->
+      <div class="form-check form-switch text-light">
+        <input class="form-check-input" type="checkbox" id="darkModeToggle">
+        <label class="form-check-label" for="darkModeToggle">🌙</label>
+      </div>
+
+      <!-- Logout POST -->
+      <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-sm">LOGOUT</button>
+      </form>
+    {% else %}
+      <a href="/accounts/login/" class="btn btn-success btn-sm">LOGIN</a>
+    {% endif %}
+
+  </div>
+</nav>
+
+<div class="container mt-5 content-wrapper">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.0/mdb.min.js"></script>
+
+<!-- 🌙 DARK MODE SCRIPT -->
+<script>
+const toggle = document.getElementById("darkModeToggle");
+const body = document.body;
+
+// Load saved mode
+if (localStorage.getItem("theme") === "dark") {
+  body.classList.add("dark-mode");
+  toggle.checked = true;
+}
+
+toggle.addEventListener("change", () => {
+  body.classList.toggle("dark-mode");
+  localStorage.setItem(
+    "theme",
+    body.classList.contains("dark-mode") ? "dark" : "light"
+  );
+});
+</script>
+
+</body>
+</html>

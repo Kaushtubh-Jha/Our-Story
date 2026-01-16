@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Add Journey</h3>
+
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <input class="form-control mb-2" name="title" placeholder="Title" required>
+  <input class="form-control mb-2" name="location" placeholder="Location" required>
+  <textarea class="form-control mb-2" name="description" placeholder="Story"></textarea>
+
+  <label class="form-label">Images</label>
+  <input type="file" name="images" class="form-control mb-3" multiple>
+
+  <label class="form-label">🎵 Background Song</label>
+  <input type="file" name="song" class="form-control mb-3" accept="audio/*">
+
+  <div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" name="is_private">
+    <label class="form-check-label">🔒 Private</label>
+  </div>
+
+  <button class="btn btn-success">Publish</button>
+</form>
+{% endblock %}

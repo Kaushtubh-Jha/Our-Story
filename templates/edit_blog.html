@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+  <h3 class="mb-4">Edit Journey</h3>
+
+  <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-3">
+    {% csrf_token %}
+
+    <!-- Title -->
+    <div class="mb-3">
+      <label class="form-label">Journey Title</label>
+      <input
+        type="text"
+        name="title"
+        class="form-control"
+        value="{{ journey.title }}"
+        required
+      >
+    </div>
+
+    <!-- Location -->
+    <div class="mb-3">
+      <label class="form-label">Location</label>
+      <input
+        type="text"
+        name="location"
+        class="form-control"
+        value="{{ journey.location }}"
+        required
+      >
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label">Story</label>
+      <textarea
+        name="description"
+        class="form-control"
+        rows="4"
+        required
+      >{{ journey.description }}</textarea>
+    </div>
+
+    <!-- Add Images -->
+    <div class="mb-4">
+      <label class="form-label">Add More Images</label>
+      <input
+        type="file"
+        name="images"
+        class="form-control"
+        multiple
+      >
+      <small class="text-muted">
+        Existing images will remain. New images will be added.
+      </small>
+    </div>
+
+    <hr>
+
+    <!-- Background Song Section -->
+    <h5 class="mb-3">🎵 Background Song</h5>
+
+    {% if journey.song %}
+      <div class="mb-3">
+        <p class="mb-1 text-muted">
+          Current Song:
+          <strong>{{ journey.song.name|cut:"journey_songs/" }}</strong>
+        </p>
+
+        <audio controls class="w-100 mb-2">
+          <source src="{{ journey.song.url }}" type="audio/mpeg">
+          Your browser does not support audio playback.
+        </audio>
+
+        <!-- Remove Song -->
+        <div class="form-check mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="remove_song"
+            id="removeSong"
+          >
+          <label class="form-check-label text-danger" for="removeSong">
+            Remove current song
+          </label>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted mb-2">No song attached to this journey.</p>
+    {% endif %}
+
+    <!-- Replace Song -->
+    <div class="mb-4">
+      <label class="form-label">Replace / Add New Song</label>
+      <input
+        type="file"
+        name="song"
+        class="form-control"
+        accept="audio/*"
+      >
+      <small class="text-muted">
+        Upload an MP3 or audio file. This will replace the existing song.
+      </small>
+    </div>
+
+    <!-- Privacy -->
+    <div class="form-check mb-4">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        name="is_private"
+        id="privateCheck"
+        {% if journey.is_private %}checked{% endif %}
+      >
+      <label class="form-check-label" for="privateCheck">
+        🔒 Make this journey private (only visible to you)
+      </label>
+    </div>
+
+    <!-- Submit -->
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        Update Journey
+      </button>
+      <a href="{% url 'blog_detail' journey.id %}" class="btn btn-secondary">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

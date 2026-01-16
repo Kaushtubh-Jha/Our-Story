@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Add Couple Journey</h3>
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <input type="text" name="title" class="form-control" placeholder="Journey Title" required>
+  </div>
+
+  <div class="mb-3">
+    <input type="text" name="location" class="form-control" placeholder="Location" required>
+  </div>
+
+  <div class="mb-3">
+    <textarea name="description" class="form-control" placeholder="Journey Story" rows="4"></textarea>
+  </div>
+
+  <div class="mb-3">
+    <input type="file" name="photo" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <select name="style" class="form-select">
+      <option value="style1">Romantic Style</option>
+      <option value="style2">Travel Diary Style</option>
+    </select>
+  </div>
+
+  <button class="btn btn-success">Publish</button>
+</form>
+{% endblock %}
