@@ -6,54 +6,142 @@
 <div class="row">
 {% for j in journeys %}
   <div class="col-md-6 mb-4">
-    <div class="card journey-card shadow-4">
+    <div class="card shadow-3">
 
       {% if j.images.all|length > 0 %}
-      <div class="image-wrapper"
-           onmouseenter="playSong('{{ j.id }}')"
-           onmouseleave="stopSong('{{ j.id }}')">
-
-        <img src="{{ j.images.all.0.image.url }}" class="journey-img">
-
-        {% if j.song %}
-        <audio id="audio-{{ j.id }}">
-          <source src="{{ j.song.url }}" type="audio/mpeg">
-        </audio>
-        {% endif %}
-      </div>
+        <img
+          src="{{ j.images.all.0.image.url }}"
+          class="card-img-top journey-image"
+          style="height:300px; object-fit:cover; cursor:pointer;"
+          data-images='[
+            {% for img in j.images.all %}
+              {
+                "src": "{{ img.image.url }}",
+                "caption": "{{ j.title }} – {{ j.location }}"
+              }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          ]'
+          onclick="openGallery(this)"
+        >
       {% endif %}
 
       <div class="card-body">
-        <h5>{{ j.title }}</h5>
+        <h5 class="card-title">{{ j.title }}</h5>
         <p class="text-muted">{{ j.location }}</p>
 
-        <a href="{% url 'blog_detail' j.id %}" class="btn btn-primary btn-sm">READ</a>
+        <a href="{% url 'blog_detail' j.id %}" class="btn btn-primary btn-sm">
+          Read
+        </a>
 
         {% if user == j.author %}
-          <a href="{% url 'edit_journey' j.id %}" class="btn btn-warning btn-sm">EDIT</a>
-          <a href="{% url 'delete_journey' j.id %}" class="btn btn-danger btn-sm">DELETE</a>
+          <a href="{% url 'edit_journey' j.id %}" class="btn btn-warning btn-sm">
+            Edit
+          </a>
+          <a href="{% url 'delete_journey' j.id %}" class="btn btn-danger btn-sm">
+            Delete
+          </a>
         {% endif %}
       </div>
     </div>
   </div>
+{% empty %}
+  <p class="text-muted text-center">No journeys yet.</p>
 {% endfor %}
 </div>
 
+<!-- ================= LIGHTBOX ================= -->
+
+<div id="lightbox" class="lightbox">
+  <span class="close-btn" onclick="closeLightbox()">×</span>
+
+  <img id="lightboxImage" src="">
+  <div id="lightboxCaption"></div>
+
+  <button class="nav-btn prev" onclick="prevImage()">❮</button>
+  <button class="nav-btn next" onclick="nextImage()">❯</button>
+
+  <div class="lightbox-controls">
+    <a id="downloadBtn" download class="btn btn-light btn-sm">
+      ⬇ Download
+    </a>
+    <button class="btn btn-secondary btn-sm" onclick="toggleSlideshow()">
+      ▶ Slideshow
+    </button>
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+
 <script>
-function playSong(id) {
-  const audio = document.getElementById('audio-' + id);
-  if (audio) {
-    audio.volume = 0.5;
-    audio.play();
+let gallery = [];
+let currentIndex = 0;
+let slideshowTimer = null;
+
+function openGallery(imgElement) {
+  gallery = JSON.parse(imgElement.getAttribute("data-images"));
+  currentIndex = 0;
+  openLightbox();
+}
+
+function openLightbox() {
+  document.getElementById("lightbox").style.display = "flex";
+  showImage();
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+  stopSlideshow();
+}
+
+function showImage() {
+  const image = gallery[currentIndex];
+  document.getElementById("lightboxImage").src = image.src;
+  document.getElementById("lightboxCaption").innerText = image.caption;
+  document.getElementById("downloadBtn").href = image.src;
+}
+
+function nextImage() {
+  currentIndex = (currentIndex + 1) % gallery.length;
+  showImage();
+}
+
+function prevImage() {
+  currentIndex = (currentIndex - 1 + gallery.length) % gallery.length;
+  showImage();
+}
+
+function toggleSlideshow() {
+  if (slideshowTimer) {
+    stopSlideshow();
+  } else {
+    slideshowTimer = setInterval(nextImage, 3000);
   }
 }
-function stopSong(id) {
-  const audio = document.getElementById('audio-' + id);
-  if (audio) {
-    audio.pause();
-    audio.currentTime = 0;
-  }
+
+function stopSlideshow() {
+  clearInterval(slideshowTimer);
+  slideshowTimer = null;
 }
+
+/* Swipe support */
+let startX = 0;
+
+document.getElementById("lightbox").addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("lightbox").addEventListener("touchend", e => {
+  let endX = e.changedTouches[0].clientX;
+  if (startX - endX > 50) nextImage();
+  if (endX - startX > 50) prevImage();
+});
+
+/* Keyboard support */
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") nextImage();
+  if (e.key === "ArrowLeft") prevImage();
+  if (e.key === "Escape") closeLightbox();
+});
 </script>
 
 {% endblock %}
